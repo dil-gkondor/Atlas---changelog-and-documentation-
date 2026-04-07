@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atlas — Changelog & Documentation</title>
+  <style>
+    /* ── Reset & base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:       #D0021B;
+      --red-dark:  #A30015;
+      --bg:        #1C2026;
+      --surface:   #252B33;
+      --surface2:  #2E3440;
+      --border:    #3A4250;
+      --text:      #F0F2F5;
+      --text-muted:#8B95A3;
+      --text-dim:  #5A6475;
+      --green:     #22C55E;
+      --yellow:    #F59E0B;
+      --blue:      #3B82F6;
+      --radius:    6px;
+      --font:      -apple-system, 'Inter', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      font-size: 12px;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .header-logo {
+      width: 24px; height: 24px;
+      background: var(--red);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 13px; font-weight: 600; }
+    .header-badge {
+      margin-left: auto;
+      font-size: 10px;
+      background: var(--red);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* ── Tabs ────────────────────────────────────────────────── */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .tab {
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); border-bottom-color: var(--red); }
+
+    /* ── Scroll area ─────────────────────────────────────────── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+    .content::-webkit-scrollbar { width: 4px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Panels ──────────────────────────────────────────────── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Cards ───────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .card-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--blue);
+      text-decoration: none;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+    .card-link:hover { text-decoration: underline; }
+
+    /* ── Status badges ───────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+    .badge-green  { background: rgba(34,197,94,0.15);  color: var(--green); }
+    .badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+    .badge-red    { background: rgba(208,2,27,0.15);   color: var(--red); }
+    .badge-blue   { background: rgba(59,130,246,0.15); color: var(--blue); }
+
+    /* ── Section headers ─────────────────────────────────────── */
+    .section-header {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin: 16px 0 8px;
+    }
+    .section-header:first-child { margin-top: 0; }
+
+    /* ── Changelog entries ───────────────────────────────────── */
+    .changelog-entry {
+      border-left: 2px solid var(--border);
+      padding-left: 12px;
+      margin-bottom: 16px;
+    }
+    .changelog-entry.major { border-left-color: var(--red); }
+    .changelog-entry.minor { border-left-color: var(--blue); }
+    .changelog-entry.patch { border-left-color: var(--text-dim); }
+    .changelog-version {
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .changelog-date { font-size: 10px; color: var(--text-dim); font-weight: 400; }
+    .changelog-items { list-style: none; margin-top: 6px; }
+    .changelog-items li {
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 2px 0;
+      display: flex;
+      gap: 6px;
+    }
+    .changelog-items li::before { content: "·"; color: var(--text-dim); }
+
+    /* ── Component list ──────────────────────────────────────── */
+    .component-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .component-row:hover { border-color: var(--red); }
+    .component-icon {
+      width: 28px; height: 28px;
+      background: var(--surface2);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .component-name { font-size: 12px; font-weight: 500; flex: 1; }
+    .component-type { font-size: 10px; color: var(--text-dim); }
+
+    /* ── Empty state ─────────────────────────────────────────── */
+    .empty {
+      text-align: center;
+      color: var(--text-dim);
+      padding: 32px 16px;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+    .empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+    /* ── Links panel ─────────────────────────────────────────── */
+    .link-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+    .link-row:hover { border-color: var(--red); }
+    .link-icon { font-size: 18px; flex-shrink: 0; }
+    .link-label { font-size: 12px; font-weight: 500; }
+    .link-desc  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .link-arrow { margin-left: auto; color: var(--text-dim); font-size: 14px; }
+
+    /* ── Token grid ──────────────────────────────────────────── */
+    .token-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .token-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+    }
+    .token-stat-value { font-size: 20px; font-weight: 700; }
+    .token-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── Loader ──────────────────────────────────────────────── */
+    .loader {
+      text-align: center;
+      color: var(--text-dim);
+      padding: 24px;
+      font-size: 11px;
+    }
+
+    /* ── Button ──────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-ghost   { background: var(--surface2); color: var(--text); }
+    .btn-row { display: flex; gap: 6px; margin-top: 8px; }
+
+    /* ── Selection info ──────────────────────────────────────── */
+    .sel-info {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .sel-name { font-size: 13px; font-weight: 600; }
+    .sel-type { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .sel-desc { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">A</div>
+    <div class="header-title">Atlas Design System</div>
+    <span class="header-badge">v1.1.0</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="inspector">Inspector</div>
+    <div class="tab" data-tab="changelog">Changelog</div>
+    <div class="tab" data-tab="components">Components</div>
+    <div class="tab" data-tab="tokens">Tokens</div>
+    <div class="tab" data-tab="links">Docs</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ── Inspector ── -->
+    <div class="panel active" id="panel-inspector">
+      <div id="inspector-content">
+        <div class="empty">
+          <div class="empty-icon">🔍</div>
+          Select a component or layer to inspect its Atlas documentation.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Changelog ── -->
+    <div class="panel" id="panel-changelog">
+      <div class="section-header">Recent releases</div>
+
+      <div class="changelog-entry major">
+        <div class="changelog-version">
+          v1.1.0 <span class="badge badge-green">Latest</span>
+          <span class="changelog-date">March 2026</span>
+        </div>
+        <ul class="changelog-items">
+          <li>Added AI chat panel, AI context panel (React)</li>
+          <li>AI chat content — new message bubble variants</li>
+          <li>Global navigation — Web component released</li>
+          <li>Data grid — MUI X integration with Atlas theme</li>
+          <li>Page header — Breadcrumbs support added</li>
+          <li>Button — deprecated <code>size="xs"</code> prop removed</li>
+        </ul>
+      </div>
+
+      <div class="changelog-entry minor">
+        <div class="changelog-version">
+          v1.0.8
+          <span class="changelog-date">January 2026</span>
+        </div>
+        <ul class="changelog-items">
+          <li>Section header — trailing button array support</li>
+          <li>Filter toolbar — multi-select chip variant</li>
+          <li>Status indicator — new RAG colour tokens</li>
+          <li>Toggle — accessible label slot added</li>
+          <li>Time picker — React preset released</li>
+        </ul>
+      </div>
+
+      <div class="changelog-entry patch">
+        <div class="changelog-version">
+          v1.0.7
+          <span class="changelog-date">November 2025</span>
+        </div>
+        <ul class="changelog-items">
+          <li>Alert — Angular: dismiss callback prop fixed</li>
+          <li>Stepper — keyboard navigation focus bug fixed</li>
+          <li>Chip — max-width truncation with tooltip</li>
+          <li>Avatar group — overflow count styling fixed</li>
+        </ul>
+      </div>
+
+      <div class="changelog-entry patch">
+        <div class="changelog-version">
+          v1.0.6
+          <span class="changelog-date">September 2025</span>
+        </div>
+        <ul class="changelog-items">
+          <li>Secondary brand colours formally deprecated (⊘ in Figma)</li>
+          <li>Gray token family deprecated — use Neutral</li>
+          <li>Data viz tokens — divergent scale expanded to 9 steps</li>
+          <li>Typography — heading-2xs token added</li>
+        </ul>
+      </div>
+
+      <a class="card-link" href="https://diligentbrands.atlassian.net/wiki" target="_blank">
+        View full changelog in Confluence ↗
+      </a>
+    </div>
+
+    <!-- ── Components ── -->
+    <div class="panel" id="panel-components">
+      <div class="token-grid">
+        <div class="token-stat">
+          <div class="token-stat-value">63</div>
+          <div class="token-stat-label">Documented components</div>
+        </div>
+        <div class="token-stat">
+          <div class="token-stat-value">50+</div>
+          <div class="token-stat-label">Products using Atlas</div>
+        </div>
+      </div>
+
+      <div class="section-header">In this file</div>
+      <div id="file-components-list">
+        <div class="loader">Loading file components…</div>
+      </div>
+
+      <div class="section-header" style="margin-top:16px">Atlas catalogue</div>
+
+      <div id="atlas-components-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ── Tokens ── -->
+    <div class="panel" id="panel-tokens">
+      <div class="section-header">Variable collections in this file</div>
+      <div id="variables-list">
+        <div class="loader">Loading variables…</div>
+      </div>
+
+      <div class="section-header" style="margin-top:16px">Local styles</div>
+      <div id="styles-list">
+        <div class="loader">Loading styles…</div>
+      </div>
+
+      <div class="section-header" style="margin-top:16px">Atlas token architecture</div>
+      <div class="card">
+        <div class="card-title">4-tier token model</div>
+        <div class="card-desc">
+          <strong>Core</strong> → raw values (hex, px, ms)<br>
+          <strong>Semantic</strong> → intent-based aliases (action, feedback, neutral…)<br>
+          <strong>Component</strong> → per-component tokens<br>
+          <strong>Density</strong> → comfortable / compact variants
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Deprecated tokens <span class="badge badge-yellow">⊘</span></div>
+        <div class="card-desc">
+          Secondary brand (blues/purples) and Gray family are deprecated.<br>
+          Use Neutral tokens instead. ⊘ icons in Figma mark deprecated values.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Docs / Links ── -->
+    <div class="panel" id="panel-links">
+      <div class="section-header">Atlas documentation</div>
+
+      <a class="link-row" href="https://diligentbrands.atlassian.net/wiki" target="_blank">
+        <span class="link-icon">📄</span>
+        <div>
+          <div class="link-label">Atlas Design System — Health Report</div>
+          <div class="link-desc">March 2026 · Foundation, Components & Patterns</div>
+        </div>
+        <span class="link-arrow">↗</span>
+      </a>
+
+      <a class="link-row" href="https://diligentbrands.atlassian.net/wiki" target="_blank">
+        <span class="link-icon">📊</span>
+        <div>
+          <div class="link-label">UI Compliance Report — Boards Cloud</div>
+          <div class="link-desc">Atlas component compliance · 15 screens reviewed</div>
+        </div>
+        <span class="link-arrow">↗</span>
+      </a>
+
+      <a class="link-row" href="https://diligentbrands.atlassian.net/wiki" target="_blank">
+        <span class="link-icon">💼</span>
+        <div>
+          <div class="link-label">Stakeholder Brief — Case for Investment</div>
+          <div class="link-desc">ROI model · €1.5M annual value · 3 asks</div>
+        </div>
+        <span class="link-arrow">↗</span>
+      </a>
+
+      <div class="section-header" style="margin-top:16px">Figma files</div>
+
+      <a class="link-row" href="https://www.figma.com/design/t9rSYPySbTWytcGTu7D1zl/Foundation---Atlas-Lens" target="_blank">
+        <span class="link-icon">🎨</span>
+        <div>
+          <div class="link-label">Foundation — Atlas Lens</div>
+          <div class="link-desc">Colors · Typography · Spacing · Icons · Effects · Grid</div>
+        </div>
+        <span class="link-arrow">↗</span>
+      </a>
+
+      <a class="link-row" href="https://www.figma.com/design/jqkfuaQjfJPEQgpgQwdnRm/Components---Atlas-Lens" target="_blank">
+        <span class="link-icon">🧩</span>
+        <div>
+          <div class="link-label">Components — Atlas Lens</div>
+          <div class="link-desc">63 documented components · Library analytics</div>
+        </div>
+        <span class="link-arrow">↗</span>
+      </a>
+
+      <a class="link-row" href="https://github.com/dil-gkondor/Atlas---changelog-and-documentation-" target="_blank">
+        <span class="link-icon">💻</span>
+        <div>
+          <div class="link-label">GitHub — Atlas Changelog & Docs</div>
+          <div class="link-desc">Plugin source · Skills · Health reports</div>
+        </div>
+        <span class="link-arrow">↗</span>
+      </a>
+    </div>
+
+  </div><!-- /content -->
+
+  <script>
+    // ── Atlas component catalogue (static reference) ──────────
+    const ATLAS_COMPONENTS = [
+      { name: "Alert",              emoji: "⚠️",  status: "stable" },
+      { name: "Avatar",             emoji: "👤",  status: "stable" },
+      { name: "Avatar group",       emoji: "👥",  status: "stable" },
+      { name: "Badge",              emoji: "🔴",  status: "stable" },
+      { name: "Breadcrumbs",        emoji: "›",   status: "react-only" },
+      { name: "Button",             emoji: "🔲",  status: "stable" },
+      { name: "Button tile",        emoji: "⊞",   status: "react-only" },
+      { name: "Card",               emoji: "🃏",  status: "stable" },
+      { name: "Checkbox",           emoji: "☑️",  status: "stable" },
+      { name: "Chip",               emoji: "🏷️",  status: "stable" },
+      { name: "Data grid",          emoji: "⊞",   status: "stable" },
+      { name: "Date picker",        emoji: "📅",  status: "stable" },
+      { name: "Dialog",             emoji: "💬",  status: "stable" },
+      { name: "Drag and drop",      emoji: "↕️",  status: "stable" },
+      { name: "Dropdown",           emoji: "▼",   status: "stable" },
+      { name: "Filter toolbar",     emoji: "🔽",  status: "react-only" },
+      { name: "Footer",             emoji: "—",   status: "stable" },
+      { name: "Form field",         emoji: "📝",  status: "stable" },
+      { name: "Global navigation",  emoji: "🧭",  status: "stable" },
+      { name: "Input",              emoji: "✏️",  status: "stable" },
+      { name: "Loading indicator",  emoji: "⏳",  status: "stable" },
+      { name: "Menu",               emoji: "☰",   status: "stable" },
+      { name: "Page header",        emoji: "📄",  status: "react-only" },
+      { name: "Pagination",         emoji: "📃",  status: "stable" },
+      { name: "Popover",            emoji: "💭",  status: "stable" },
+      { name: "Section header",     emoji: "📌",  status: "react-only" },
+      { name: "Side sheet",         emoji: "◧",   status: "stable" },
+      { name: "Skeleton",           emoji: "👻",  status: "stable" },
+      { name: "Stepper",            emoji: "📶",  status: "stable" },
+      { name: "Table",              emoji: "📊",  status: "stable" },
+      { name: "Tabs",               emoji: "🗂️",  status: "stable" },
+      { name: "Toast",              emoji: "🍞",  status: "stable" },
+      { name: "Toggle",             emoji: "⏸",   status: "stable" },
+      { name: "Tooltip",            emoji: "💡",  status: "stable" },
+      { name: "AI chat box",        emoji: "🤖",  status: "experimental" },
+      { name: "AI chat content",    emoji: "✨",  status: "experimental" },
+      { name: "AI context panel",   emoji: "🧠",  status: "experimental" },
+    ];
+
+    // ── State ─────────────────────────────────────────────────
+    let currentTab = "inspector";
+    let fileComponents = [];
+    let fileVariables  = [];
+    let fileStyles     = {};
+
+    // ── Tab switching ─────────────────────────────────────────
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+        tab.classList.add("active");
+        currentTab = tab.dataset.tab;
+        document.getElementById("panel-" + currentTab).classList.add("active");
+
+        if (currentTab === "components" && fileComponents.length === 0) {
+          parent.postMessage({ pluginMessage: { type: "GET_FILE_COMPONENTS" } }, "*");
+        }
+        if (currentTab === "tokens" && fileVariables.length === 0) {
+          parent.postMessage({ pluginMessage: { type: "GET_VARIABLES" } }, "*");
+          parent.postMessage({ pluginMessage: { type: "GET_STYLES" } }, "*");
+        }
+      });
+    });
+
+    // ── Render helpers ────────────────────────────────────────
+    function renderInspector(selection) {
+      const el = document.getElementById("inspector-content");
+      if (!selection || selection.length === 0) {
+        el.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div>Select a component or layer to inspect its Atlas documentation.</div>`;
+        return;
+      }
+      const item = selection[0];
+      const atlasMatch = ATLAS_COMPONENTS.find(c =>
+        item.componentName && item.componentName.toLowerCase().includes(c.name.toLowerCase())
+      );
+      const statusBadge = atlasMatch
+        ? (atlasMatch.status === "stable"       ? `<span class="badge badge-green">✅ Atlas</span>` :
+           atlasMatch.status === "react-only"    ? `<span class="badge badge-blue">React only</span>` :
+           atlasMatch.status === "experimental"  ? `<span class="badge badge-yellow">⚠️ Experimental</span>` : "")
+        : `<span class="badge badge-red">Custom / Not Atlas</span>`;
+
+      el.innerHTML = `
+        <div class="sel-info">
+          <div class="sel-name">${item.componentName || item.name}</div>
+          <div class="sel-type">${item.type} ${statusBadge}</div>
+          ${item.description ? `<div class="sel-desc">${item.description}</div>` : ""}
+        </div>
+        ${atlasMatch ? `
+        <div class="card">
+          <div class="card-title">${atlasMatch.emoji} ${atlasMatch.name}</div>
+          <div class="card-desc">Atlas component · ${atlasMatch.status === "react-only" ? "React only" : atlasMatch.status === "experimental" ? "⚠️ Experimental — not production-ready" : "Available in React + Angular"}</div>
+        </div>` : `
+        <div class="card">
+          <div class="card-title">Custom component</div>
+          <div class="card-desc">This component doesn't map to a documented Atlas component. Consider contributing it to Atlas or replacing it with an existing Atlas component.</div>
+        </div>`}
+        ${selection.length > 1 ? `<div class="card-meta">+ ${selection.length - 1} more selected</div>` : ""}
+      `;
+    }
+
+    function renderFileComponents(components) {
+      const el = document.getElementById("file-components-list");
+      if (!components || components.length === 0) {
+        el.innerHTML = `<div class="empty">No components found in this file.</div>`;
+        return;
+      }
+      el.innerHTML = components.slice(0, 30).map(c => `
+        <div class="component-row" data-id="${c.id}">
+          <div class="component-icon">🧩</div>
+          <div>
+            <div class="component-name">${c.name}</div>
+            ${c.description ? `<div class="component-type">${c.description.slice(0, 60)}${c.description.length > 60 ? "…" : ""}</div>` : ""}
+          </div>
+        </div>
+      `).join("") + (components.length > 30 ? `<div class="card-meta" style="padding:8px 0">+ ${components.length - 30} more</div>` : "");
+
+      el.querySelectorAll(".component-row").forEach(row => {
+        row.addEventListener("click", () => {
+          parent.postMessage({ pluginMessage: { type: "NAVIGATE_TO_NODE", nodeId: row.dataset.id } }, "*");
+        });
+      });
+
+      // Atlas catalogue
+      const atlasEl = document.getElementById("atlas-components-list");
+      atlasEl.innerHTML = ATLAS_COMPONENTS.map(c => {
+        const badge = c.status === "stable" ? "badge-green" : c.status === "react-only" ? "badge-blue" : "badge-yellow";
+        const label = c.status === "stable" ? "Stable" : c.status === "react-only" ? "React" : "Experimental";
+        return `<div class="component-row">
+          <div class="component-icon">${c.emoji}</div>
+          <div class="component-name">${c.name}</div>
+          <span class="badge ${badge}">${label}</span>
+        </div>`;
+      }).join("");
+    }
+
+    function renderVariables(variables) {
+      const el = document.getElementById("variables-list");
+      if (!variables || variables.length === 0) {
+        el.innerHTML = `<div class="empty">No variable collections found.</div>`;
+        return;
+      }
+      el.innerHTML = `<div class="token-grid">
+        ${variables.map(v => `
+          <div class="token-stat">
+            <div class="token-stat-value">${v.variableCount}</div>
+            <div class="token-stat-label">${v.name}</div>
+          </div>`).join("")}
+      </div>`;
+    }
+
+    function renderStyles(styles) {
+      const el = document.getElementById("styles-list");
+      el.innerHTML = `<div class="token-grid">
+        <div class="token-stat"><div class="token-stat-value">${styles.colors?.length || 0}</div><div class="token-stat-label">Colour styles</div></div>
+        <div class="token-stat"><div class="token-stat-value">${styles.text?.length || 0}</div><div class="token-stat-label">Text styles</div></div>
+        <div class="token-stat"><div class="token-stat-value">${styles.effects?.length || 0}</div><div class="token-stat-label">Effect styles</div></div>
+        <div class="token-stat"><div class="token-stat-value">${styles.grids?.length || 0}</div><div class="token-stat-label">Grid styles</div></div>
+      </div>`;
+    }
+
+    // ── Message handler ───────────────────────────────────────
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      switch (msg.type) {
+        case "INIT":
+          renderInspector(msg.data.selection);
+          break;
+        case "SELECTION_CHANGED":
+          renderInspector(msg.data);
+          break;
+        case "FILE_COMPONENTS":
+          fileComponents = msg.data;
+          renderFileComponents(fileComponents);
+          break;
+        case "VARIABLES_DATA":
+          fileVariables = msg.data;
+          renderVariables(fileVariables);
+          break;
+        case "STYLES_DATA":
+          fileStyles = msg.data;
+          renderStyles(fileStyles);
+          break;
+      }
+    };
+  </script>
+</body>
+</html>

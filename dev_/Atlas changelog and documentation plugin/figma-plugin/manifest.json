@@ -1,0 +1,15 @@
+{
+  "name": "Atlas — Changelog & Documentation",
+  "id": "1234567890123456",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma", "figjam"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "diligentbrands.atlassian.net",
+      "www.figma.com"
+    ]
+  }
+}
