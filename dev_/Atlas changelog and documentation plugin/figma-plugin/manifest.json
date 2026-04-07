@@ -8,8 +8,8 @@
   "documentAccess": "dynamic-page",
   "networkAccess": {
     "allowedDomains": [
-      "diligentbrands.atlassian.net",
-      "www.figma.com"
+      "https://diligentbrands.atlassian.net",
+      "https://www.figma.com"
     ]
   }
 }
